@@ -1,0 +1,16 @@
+/.atomenv.json
+/.idea/
+/.bundle/
+/.yardoc
+/Gemfile.lock
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+/vendor
+/ext/argon2-wrapper/libargon2-wrapper.so
+/ext/argon2-wrapper/tests
+/ext/argon2-wrapper/libargon2-wrapper.bundle*
+passwordping-1.0.0.gem
