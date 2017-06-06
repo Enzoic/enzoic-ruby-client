@@ -1,3 +1,4 @@
+.DS_store
 /.atomenv.json
 /.idea/
 /.bundle/
@@ -9,7 +10,6 @@
 /pkg/
 /spec/reports/
 /tmp/
-/vendor
 /ext/argon2-wrapper/libargon2-wrapper.so
 /ext/argon2-wrapper/tests
 /ext/argon2-wrapper/libargon2-wrapper.bundle*

@@ -1,8 +1,11 @@
 require 'passwordping/argon2_wrapper_ffi'
 require 'digest'
-require 'cryptopp'
+#require 'cryptopp'
 require 'bcrypt'
 require 'unix_crypt'
+require 'zlib'
+require 'digest/whirlpool'
+#require 'whirlpool'
 
 module PasswordPing
   class Hashing
@@ -39,21 +42,19 @@ module PasswordPing
     end
 
     def self.whirlpool(to_hash)
-      return CryptoPP.digest_factory(:whirlpool, to_hash).digest_hex
+      return Digest::Whirlpool.hexdigest(to_hash)
     end
 
     def self.whirlpool_binary(to_hash)
-      return CryptoPP.digest_factory(:whirlpool, to_hash).digest
+      return Digest::Whirlpool.digest(to_hash)
     end
 
     def self.whirlpool_binary_array(to_hash)
-      return CryptoPP.digest_factory(:whirlpool, to_hash).digest.bytes
+      return Digest::Whirlpool.digest(to_hash).bytes
     end
 
     def self.crc32(to_hash)
-      hash = CryptoPP.digest_factory(:crc32, to_hash).digest_hex
-      # correct for endian-ness
-      return hash[6] + hash[7] + hash[4] + hash[5] + hash[2] + hash[3] + hash[0] + hash[1]
+      return Zlib.crc32(to_hash, 0).to_s(16)
     end
 
     def self.mybb(to_hash, salt)

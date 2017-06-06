@@ -23,7 +23,7 @@ class HashingTest < Test::Unit::TestCase
   end
 
   def test_crc32
-    assert_equal("0972d361", PasswordPing::Hashing.crc32("123456"))
+    assert_equal("972d361", PasswordPing::Hashing.crc32("123456"))
   end
 
   def test_mybb

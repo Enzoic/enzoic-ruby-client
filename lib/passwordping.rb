@@ -26,7 +26,7 @@ module PasswordPing
     def check_credentials(username, password)
       raise PasswordPingFail, "API key/Secret not set" if !@authString || @authString == ''
 
-      response = make_rest_call(@baseURL + Constants::ACCOUNTS_API_PATH + "?username=" + CGI.escape(username), "GET", nil)
+      response = make_rest_call(@baseURL + Constants::ACCOUNTS_API_PATH + "?username=" + Hashing.sha256(username), "GET", nil)
 
       if (response == "404")
         return false
@@ -84,7 +84,7 @@ module PasswordPing
     end
 
     def get_exposures_for_user(username)
-      response = make_rest_call(@baseURL + Constants::EXPOSURES_API_PATH + "?username=" + CGI.escape(username),
+      response = make_rest_call(@baseURL + Constants::EXPOSURES_API_PATH + "?username=" + Hashing.sha256(username),
         "GET", nil)
 
       if (response == "404")
