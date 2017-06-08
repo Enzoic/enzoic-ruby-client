@@ -1,11 +1,10 @@
 require 'passwordping/argon2_wrapper_ffi'
 require 'digest'
-#require 'cryptopp'
 require 'bcrypt'
 require 'unix_crypt'
 require 'zlib'
 require 'digest/whirlpool'
-#require 'whirlpool'
+require 'base64'
 
 module PasswordPing
   class Hashing
@@ -66,7 +65,23 @@ module PasswordPing
     end
 
     def self.bcrypt(to_hash, salt)
-      return BCrypt::Engine.hash_secret(to_hash, salt)
+      # if salt starts with $2y$, first replace with $2a$
+      if salt[0..3] == "$2y$"
+        y_variant = true
+        checked_salt = "$2a$" + salt[4..-1]
+      else
+        y_variant = false
+        checked_salt = salt
+      end
+
+      result = BCrypt::Engine.hash_secret(to_hash, checked_salt)
+
+      if y_variant
+        # replace with $2y$
+        result = "$2y$" + result[4..-1]
+      end
+
+      return result
     end
 
     def self.phpbb3(to_hash, salt)
@@ -136,8 +151,49 @@ module PasswordPing
       return UnixCrypt::MD5.build(to_hash, salt.start_with?("$1$") ? salt[3..salt.length] : salt);
     end
 
+    def self.custom_algorithm4(to_hash, salt)
+      return self.bcrypt(self.md5(to_hash), salt)
+    end
+
     def self.argon2(to_hash, salt)
-      return Argon2Wrapper.hash_argon2d_encode(to_hash, salt, 3, 10, 2, 20)
+      time_cost = 3
+      mem_cost = 10
+      threads = 2
+      hash_length = 20
+      just_salt = salt
+
+      #$argon2i$v=19$m=65536,t=2,p=4$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG
+      if (salt[0..6] == "$argon2")
+        # looks like we specified algo info for argon2 in the salt
+        salt_values = salt.split("$")
+        just_salt = Base64.decode64(salt_values[4])
+        cost_params = salt_values[3].split(",")
+
+        for param in cost_params
+          begin
+            param_parts = param.split("=")
+            if (param_parts[0] == "t")
+              time_cost = Integer(param_parts[1])
+            elsif (param_parts[0] == "m")
+              mem_cost = Math.log2(Integer(param_parts[1])).round
+            elsif (param_parts[0] == "p")
+              threads = Integer(param_parts[1])
+            elsif (param_parts[0] == "l")
+              hash_length = Integer(param_parts[1])
+            end
+          rescue ArgumentError
+            # ignore invalid params and just use default
+          end
+        end
+
+        if (salt_values[1] == "argon2i")
+          return Argon2Wrapper.hash_argon2i_encode(to_hash, just_salt, time_cost, mem_cost, threads, hash_length)
+        else
+          return Argon2Wrapper.hash_argon2d_encode(to_hash, just_salt, time_cost, mem_cost, threads, hash_length)
+        end
+      else
+        return Argon2Wrapper.hash_argon2d_encode(to_hash, just_salt, time_cost, mem_cost, threads, hash_length)
+      end
     end
 
     def self.xor(byte_array1, byte_array2)

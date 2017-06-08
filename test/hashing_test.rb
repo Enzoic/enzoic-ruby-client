@@ -51,11 +51,20 @@ class HashingTest < Test::Unit::TestCase
     assert_equal("579d9ec9d0c3d687aaa91289ac2854e4", PasswordPing::Hashing.custom_algorithm2("123456", "123"))
   end
 
+  def test_custom_algorithm4
+    assert_equal("$2y$12$Yjk3YjIzYWIxNDg0YWMzZOpp/eAMuWCD3UwX1oYgRlC1ci4Al970W", PasswordPing::Hashing.custom_algorithm4("1234", "$2y$12$Yjk3YjIzYWIxNDg0YWMzZO"))
+  end
+
   def test_md5crypt
     assert_equal("$1$4d3c09ea$hPwyka2ToWFbLTOq.yFjf.", PasswordPing::Hashing.md5crypt("123456", "$1$4d3c09ea"))
   end
 
   def test_argon2
     assert_equal("$argon2d$v=19$m=1024,t=3,p=2$c2FsdHlzYWx0$EklGIPtCSWb3IS+q4IQ7rwrwm2o", PasswordPing::Hashing.argon2("123456", "saltysalt"))
+    assert_equal("$argon2d$v=19$m=1024,t=3,p=2$c2FsdHlzYWx0$EklGIPtCSWb3IS+q4IQ7rwrwm2o", PasswordPing::Hashing.argon2("123456", "$argon2d$v=19$m=1024,t=3,p=2$c2FsdHlzYWx0"))
+    assert_equal("$argon2i$v=19$m=65536,t=2,p=4$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG", PasswordPing::Hashing.argon2("password", "$argon2i$v=19$m=65536,t=2,p=4,l=24$c29tZXNhbHQ"))
+
+    # ensure exception handling works for invalid params
+    assert_equal("$argon2d$v=19$m=1024,t=3,p=2$c2FsdHlzYWx0$EklGIPtCSWb3IS+q4IQ7rwrwm2o", PasswordPing::Hashing.argon2("123456", "$argon2d$v=19$m=10d2,t=ejw,p=2$c2FsdHlzYWx0"))
   end
 end
