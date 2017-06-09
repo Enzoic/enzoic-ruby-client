@@ -1,6 +1,6 @@
 # PasswordPing Ruby Client Library
 
-[![Build Status](https://travis-ci.org/PasswordPing/passwordping-ruby-client.svg?branch=master)](https://travis-ci.org/PasswordPing/passwordping-ruby-client)
+#[![Build Status](https://travis-ci.org/PasswordPing/passwordping-ruby-client.svg?branch=master)](https://travis-ci.org/PasswordPing/passwordping-ruby-client)
 
 ## TOC
 
