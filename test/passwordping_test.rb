@@ -31,6 +31,7 @@ class PasswordPingTest < Test::Unit::TestCase
   def test_check_credentials
     passwordping = get_passwordping()
     assert(passwordping.check_credentials('test@passwordping.com', '123456'))
+    assert(!passwordping.check_credentials('test@passwordping.com', '123456122'))
   end
 
   def test_check_password

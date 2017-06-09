@@ -30,5 +30,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", '~> 10.4', '>= 10.4.2'
   spec.add_development_dependency "test-unit", '~> 3.2', '>= 3.2.4'
   spec.add_development_dependency "rake-compiler", '~> 1.0', '>= 1.0.4'
+  spec.add_development_dependency "io-console", '~> 0.4', '>= 0.4.6'
   spec.extensions = ['ext/argon2-wrapper/extconf.rb', "ext/digest/whirlpool/extconf.rb" ]
 end

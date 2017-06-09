@@ -67,4 +67,13 @@ class HashingTest < Test::Unit::TestCase
     # ensure exception handling works for invalid params
     assert_equal("$argon2d$v=19$m=1024,t=3,p=2$c2FsdHlzYWx0$EklGIPtCSWb3IS+q4IQ7rwrwm2o", PasswordPing::Hashing.argon2("123456", "$argon2d$v=19$m=10d2,t=ejw,p=2$c2FsdHlzYWx0"))
   end
+
+  def test_argon2_raw
+    assert_equal("12494620fb424966f7212faae0843baf0af09b6a", PasswordPing::Hashing.argon2_raw("123456", "saltysalt"))
+    assert_equal("12494620fb424966f7212faae0843baf0af09b6a", PasswordPing::Hashing.argon2_raw("123456", "$argon2d$v=19$m=1024,t=3,p=2$c2FsdHlzYWx0"))
+    assert_equal("45d7ac72e76f242b20b77b9bf9bf9d5915894e669a24e6c6", PasswordPing::Hashing.argon2_raw("password", "$argon2i$v=19$m=65536,t=2,p=4,l=24$c29tZXNhbHQ"))
+
+    # ensure exception handling works for invalid params
+    assert_equal("12494620fb424966f7212faae0843baf0af09b6a", PasswordPing::Hashing.argon2_raw("123456", "$argon2d$v=19$m=10d2,t=ejw,p=2$c2FsdHlzYWx0"))
+  end
 end

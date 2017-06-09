@@ -123,10 +123,7 @@ module PasswordPing
         password_hash = calc_password_hash(hash_spec["hashType"], password, hash_spec["salt"])
 
         if (password_hash != nil)
-          argon2_hash = Hashing.argon2(username + "$" + password_hash, salt)
-
-          just_hash = argon2_hash[argon2_hash.rindex('$') + 1 .. argon2_hash.length]
-          return Base64.decode64(just_hash).unpack('H*')[0]
+          return Hashing.argon2_raw(username + "$" + password_hash, salt)
         else
           return nil
         end

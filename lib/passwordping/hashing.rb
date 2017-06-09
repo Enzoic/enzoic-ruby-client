@@ -155,6 +155,47 @@ module PasswordPing
       return self.bcrypt(self.md5(to_hash), salt)
     end
 
+    def self.argon2_raw(to_hash, salt)
+      time_cost = 3
+      mem_cost = 10
+      threads = 2
+      hash_length = 20
+      just_salt = salt
+
+      #$argon2i$v=19$m=65536,t=2,p=4$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG
+      if (salt[0..6] == "$argon2")
+        # looks like we specified algo info for argon2 in the salt
+        salt_values = salt.split("$")
+        just_salt = Base64.decode64(salt_values[4])
+        cost_params = salt_values[3].split(",")
+
+        for param in cost_params
+          begin
+            param_parts = param.split("=")
+            if (param_parts[0] == "t")
+              time_cost = Integer(param_parts[1])
+            elsif (param_parts[0] == "m")
+              mem_cost = Math.log2(Integer(param_parts[1])).round
+            elsif (param_parts[0] == "p")
+              threads = Integer(param_parts[1])
+            elsif (param_parts[0] == "l")
+              hash_length = Integer(param_parts[1])
+            end
+          rescue ArgumentError
+            # ignore invalid params and just use default
+          end
+        end
+
+        if (salt_values[1] == "argon2i")
+          return Argon2Wrapper.hash_argon2i(to_hash, just_salt, time_cost, mem_cost, threads, hash_length)
+        else
+          return Argon2Wrapper.hash_argon2d(to_hash, just_salt, time_cost, mem_cost, threads, hash_length)
+        end
+      else
+        return Argon2Wrapper.hash_argon2d(to_hash, just_salt, time_cost, mem_cost, threads, hash_length)
+      end
+    end
+
     def self.argon2(to_hash, salt)
       time_cost = 3
       mem_cost = 10
