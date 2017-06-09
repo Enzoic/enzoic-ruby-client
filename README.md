@@ -78,6 +78,8 @@ passwordping = PasswordPing::PasswordPing.new(apiKey: YOUR_API_KEY, secret: YOUR
 
 OSX and Linux platforms are fully supported.  Windows is not, since FFI support is needed for some of the cryptography libraries, which is problematic on Windows.
 
+Ruby 2.0.0 and up are supported.
+
 ## RubyDocs
 
 The RubyDocs contain more complete references for the API functions.  
