@@ -137,6 +137,8 @@ module PasswordPing
           return Hashing.sha1(password)
         when PasswordType::SHA256
           return Hashing.sha256(password)
+        when PasswordType::SHA512
+          return Hashing.sha512(password)
         when PasswordType::IPBoard_MyBB
           if (salt != nil && salt.length > 0)
             return Hashing.mybb(password, salt)
@@ -170,6 +172,10 @@ module PasswordPing
         when PasswordType::MD5Crypt
           if (salt != nil && salt.length > 0)
             return Hashing.md5crypt(password, salt)
+          end
+        when PasswordType::CustomAlgorithm4
+          if (salt != nil && salt.length > 0)
+            return Hashing.custom_algorithm4(password, salt)
           end
         end
 

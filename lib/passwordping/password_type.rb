@@ -17,6 +17,7 @@ module PasswordPing
     CustomAlgorithm2 = 13
     SHA512 = 14
     MD5Crypt = 16
+    CustomAlgorithm4 = 17
     Unknown = 97
     UnusablePassword = 98
     None = 99
