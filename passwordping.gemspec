@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rest-client', '~> 2.0', '>= 2.0.2'
   spec.add_dependency 'bcrypt', '~> 3.1', '>= 3.1.11'
   spec.add_dependency 'unix-crypt', '~> 1.3'
+  spec.add_dependency 'base64url', '~> 1.0', '>= 1.0.1'
 
   spec.add_development_dependency "bundler", '~> 1.10', '>= 1.10.5'
   spec.add_development_dependency "rake", '~> 10.4', '>= 10.4.2'

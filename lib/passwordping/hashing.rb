@@ -4,7 +4,7 @@ require 'bcrypt'
 require 'unix_crypt'
 require 'zlib'
 require 'digest/whirlpool'
-require 'base64'
+require 'base64url'
 
 module PasswordPing
   class Hashing
@@ -166,7 +166,7 @@ module PasswordPing
       if (salt[0..6] == "$argon2")
         # looks like we specified algo info for argon2 in the salt
         salt_values = salt.split("$")
-        just_salt = Base64.decode64(salt_values[4])
+        just_salt = Base64URL.decode(salt_values[4])
         cost_params = salt_values[3].split(",")
 
         for param in cost_params
@@ -207,7 +207,7 @@ module PasswordPing
       if (salt[0..6] == "$argon2")
         # looks like we specified algo info for argon2 in the salt
         salt_values = salt.split("$")
-        just_salt = Base64.decode64(salt_values[4])
+        just_salt = Base64URL.decode(salt_values[4])
         cost_params = salt_values[3].split(",")
 
         for param in cost_params
