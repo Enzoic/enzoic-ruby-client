@@ -65,13 +65,13 @@ More information in reference format can be found below.
 The standard constructor takes the API key and secret you were issued on PasswordPing signup.
 
 ```ruby
-passwordping = PasswordPing::PasswordPing(YOUR_API_KEY, YOUR_API_SECRET)
+passwordping = PasswordPing::PasswordPing.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET)
 ```
 
 If you were instructed to use an alternate API endpoint, you may call the overloaded constructor and pass the base URL you were provided.
 
 ```ruby
-passwordping = PasswordPing::PasswordPing(YOUR_API_KEY, YOUR_API_SECRET, "https://api-alt.passwordping.com/v1")
+passwordping = PasswordPing::PasswordPing.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET, baseURL: "https://api-alt.passwordping.com/v1")
 ```
 
 ## Platform Requirements
