@@ -1,5 +1,7 @@
 # PasswordPing Ruby Client Library
 
+PLEASE NOTE: THIS IS A BRANCH OF THE PASSWORDPING RUBY LIBRARY MEANT TO SUPPORT EARLIER VERSIONS OF RUBY, FROM 1.8.7 UP.  IF YOU DO
+NOT NEED LEGACY RUBY SUPPORT, USE THE MASTER BRANCH VERSION: https://github.com/passwordping/passwordping-ruby-client
 
 ## TOC
 
@@ -17,7 +19,7 @@ This README covers the following topics:
 The compiled library is available as a Ruby Gem:
 
 ```shell
-gem install passwordping
+gem install passwordping_legacy
 ```
 
 ### Source
@@ -32,7 +34,7 @@ Here's the API in a nutshell.
 require 'passwordping'
 
 # Create a new PasswordPing instance - this is our primary interface for making API calls
-passwordping = PasswordPing::PasswordPing.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET)
+passwordping = PasswordPing::PasswordPing.new(YOUR_API_KEY, YOUR_API_SECRET)
 
 # Check whether a password has been compromised
 if passwordping.check_password("password-to-test")
@@ -64,26 +66,26 @@ More information in reference format can be found below.
 The standard constructor takes the API key and secret you were issued on PasswordPing signup.
 
 ```ruby
-passwordping = PasswordPing::PasswordPing.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET)
+passwordping = PasswordPing::PasswordPing.new(YOUR_API_KEY, YOUR_API_SECRET)
 ```
 
 If you were instructed to use an alternate API endpoint, you may call the overloaded constructor and pass the base URL you were provided.
 
 ```ruby
-passwordping = PasswordPing::PasswordPing.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET, baseURL: "https://api-alt.passwordping.com/v1")
+passwordping = PasswordPing::PasswordPing.new(YOUR_API_KEY, YOUR_API_SECRET, "https://api-alt.passwordping.com/v1")
 ```
 
 ## Platform Requirements
 
-OSX and Linux platforms are fully supported.  Windows is not, since FFI support is needed for some of the cryptography libraries, which is problematic on Windows.
+All platforms are fully supported.  
 
-Ruby 2.0.0 and up are supported.
+Ruby 1.8.7 and up are supported by this version.  If you do not require legacy Ruby support, use the version of this library in the master branch.
 
 ## RubyDocs
 
 The RubyDocs contain more complete references for the API functions.  
 
-They can be found here: <http://www.rubydoc.info/gems/passwordping>
+They can be found here: <http://www.rubydoc.info/gems/passwordping_legacy>
 
 ## License
 
