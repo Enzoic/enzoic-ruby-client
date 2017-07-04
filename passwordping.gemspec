@@ -4,14 +4,14 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'passwordping/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "passwordping"
+  spec.name          = "passwordping_legacy"
   spec.version       = PasswordPing::VERSION
   spec.authors       = ["PasswordPing"]
   spec.email         = ["support@passwordping.com"]
 
-  spec.summary       = 'Ruby library for PasswordPing API'
-  spec.description   = 'Ruby library for PasswordPing API'
-  spec.homepage      = 'https://github.com/passwordping/passwordping-ruby-client'
+  spec.summary       = 'Ruby 1.8.7 library for PasswordPing API'
+  spec.description   = 'Ruby 1.8.7 library for PasswordPing API.  Use the passwordping gem instead of this one unless you need support for older versions of Ruby.'
+  spec.homepage      = 'https://github.com/passwordping/passwordping-ruby-client/tree/ruby_1.8.7_support'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
@@ -29,8 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", '~> 1.10', '>= 1.10.5'
   spec.add_development_dependency "rake", '~> 10.4', '>= 10.4.2'
   spec.add_development_dependency "test-unit", '2.5.5'
-#  spec.add_development_dependency "test-unit", '~> 3.2', '>= 3.2.4'
   spec.add_development_dependency "rake-compiler", '~> 1.0', '>= 1.0.4'
-#  spec.add_development_dependency "io-console", '~> 0.4', '>= 0.4.6'
   spec.extensions = ['ext/argon2_import/extconf.rb', 'ext/digest/whirlpool/extconf.rb' ]
 end
