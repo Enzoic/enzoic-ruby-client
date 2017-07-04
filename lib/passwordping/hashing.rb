@@ -1,10 +1,11 @@
-require 'passwordping/argon2_wrapper_ffi'
+require 'passwordping/argon2_wrapper'
 require 'digest'
 require 'bcrypt'
 require 'unix_crypt'
 require 'zlib'
 require 'digest/whirlpool'
 require 'base64url'
+require 'openssl'
 
 module PasswordPing
   class Hashing
@@ -17,7 +18,7 @@ module PasswordPing
     end
 
     def self.md5_binary_array(to_hash_bytes)
-      return Digest::MD5.digest(to_hash_bytes.pack('c*')).bytes
+      return Digest::MD5.digest(to_hash_bytes.pack('c*')).bytes.collect
     end
 
     def self.sha1(to_hash)
@@ -29,15 +30,15 @@ module PasswordPing
     end
 
     def self.sha512(to_hash)
-      return Digest::SHA512.hexdigest to_hash
+      return OpenSSL::Digest::SHA512.new(to_hash).hexdigest
     end
 
     def self.sha512_binary(to_hash)
-      return Digest::SHA512.digest to_hash
+      return OpenSSL::Digest::SHA512.new(to_hash).digest
     end
 
     def self.sha512_binary_array(to_hash)
-      return Digest::SHA512.digest(to_hash).bytes
+      return OpenSSL::Digest::SHA512.new(to_hash).digest.bytes.collect
     end
 
     def self.whirlpool(to_hash)
@@ -49,7 +50,7 @@ module PasswordPing
     end
 
     def self.whirlpool_binary_array(to_hash)
-      return Digest::Whirlpool.digest(to_hash).bytes
+      return Digest::Whirlpool.digest(to_hash).bytes.collect
     end
 
     def self.crc32(to_hash)
@@ -66,9 +67,9 @@ module PasswordPing
 
     def self.bcrypt(to_hash, salt)
       # if salt starts with $2y$, first replace with $2a$
-      if salt[0..3] == "$2y$"
+      if salt[0..3] == '$2y$'
         y_variant = true
-        checked_salt = "$2a$" + salt[4..-1]
+        checked_salt = '$2a$' + salt[4..-1]
       else
         y_variant = false
         checked_salt = salt
@@ -78,30 +79,30 @@ module PasswordPing
 
       if y_variant
         # replace with $2y$
-        result = "$2y$" + result[4..-1]
+        result = '$2y$' + result[4..-1]
       end
 
       return result
     end
 
     def self.phpbb3(to_hash, salt)
-      if !salt.start_with?("$H$")
-        return ""
+      if !salt.start_with?('$H$')
+        return ''
       end
 
-      itoa64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-      to_hash_bytes = to_hash.bytes
+      itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+      to_hash_bytes = to_hash.bytes.collect
       count = 2**itoa64.index(salt[3])
       justsalt = salt[4..12]
 
-      hash = self.md5_binary(justsalt + to_hash)
+      hash = self.md5_binary(justsalt + to_hash).collect
       loop do
-        hash = self.md5_binary_array(hash.push(to_hash_bytes).flatten!)
+        hash = self.md5_binary_array((hash << to_hash_bytes).flatten!)
         count = count - 1;
         break if count == 0
       end
 
-      hashout = ""
+      hashout = ''
       i = 0
       count = 16
       value = 0
@@ -109,12 +110,13 @@ module PasswordPing
       loop do
         value = hash[i] + (hash[i] < 0 ? 256 : 0)
         i = i + 1
-        hashout = hashout + itoa64[value & 63]
+        hashout = hashout + itoa64[value & 63].chr
+
         if i < count
           value = value | (hash[i] + (hash[i] < 0 ? 256 : 0)) << 8;
         end
 
-        hashout = hashout + itoa64[(value >> 6) & 63]
+        hashout = hashout + itoa64[(value >> 6) & 63].chr
         i = i + 1
         if (i >= count)
           break
@@ -124,14 +126,14 @@ module PasswordPing
           value = value | (hash[i] + (hash[i] < 0 ? 256 : 0)) << 16
         end
 
-        hashout = hashout + itoa64[(value >> 12) & 63]
+        hashout = hashout + itoa64[(value >> 12) & 63].chr
 
         i = i + 1
         if (i >= count)
           break
         end
 
-        hashout = hashout + itoa64[(value >> 18) & 63]
+        hashout = hashout + itoa64[(value >> 18) & 63].chr
 
         break if i == count
       end
@@ -148,7 +150,7 @@ module PasswordPing
     end
 
     def self.md5crypt(to_hash, salt)
-      return UnixCrypt::MD5.build(to_hash, salt.start_with?("$1$") ? salt[3..salt.length] : salt);
+      return UnixCrypt::MD5.build(to_hash, salt.start_with?('$1$') ? salt[3..salt.length] : salt);
     end
 
     def self.custom_algorithm4(to_hash, salt)
@@ -163,22 +165,22 @@ module PasswordPing
       just_salt = salt
 
       #$argon2i$v=19$m=65536,t=2,p=4$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG
-      if (salt[0..6] == "$argon2")
+      if (salt[0..6] == '$argon2')
         # looks like we specified algo info for argon2 in the salt
-        salt_values = salt.split("$")
+        salt_values = salt.split('$')
         just_salt = Base64URL.decode(salt_values[4])
-        cost_params = salt_values[3].split(",")
+        cost_params = salt_values[3].split(',')
 
         for param in cost_params
           begin
-            param_parts = param.split("=")
-            if (param_parts[0] == "t")
+            param_parts = param.split('=')
+            if (param_parts[0] == 't')
               time_cost = Integer(param_parts[1])
-            elsif (param_parts[0] == "m")
-              mem_cost = Math.log2(Integer(param_parts[1])).round
-            elsif (param_parts[0] == "p")
+            elsif (param_parts[0] == 'm')
+              mem_cost = (Math.log10(Integer(param_parts[1])) / 0.30103).round
+            elsif (param_parts[0] == 'p')
               threads = Integer(param_parts[1])
-            elsif (param_parts[0] == "l")
+            elsif (param_parts[0] == 'l')
               hash_length = Integer(param_parts[1])
             end
           rescue ArgumentError
@@ -186,7 +188,7 @@ module PasswordPing
           end
         end
 
-        if (salt_values[1] == "argon2i")
+        if (salt_values[1] == 'argon2i')
           return Argon2Wrapper.hash_argon2i(to_hash, just_salt, time_cost, mem_cost, threads, hash_length)
         else
           return Argon2Wrapper.hash_argon2d(to_hash, just_salt, time_cost, mem_cost, threads, hash_length)
@@ -204,22 +206,22 @@ module PasswordPing
       just_salt = salt
 
       #$argon2i$v=19$m=65536,t=2,p=4$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG
-      if (salt[0..6] == "$argon2")
+      if (salt[0..6] == '$argon2')
         # looks like we specified algo info for argon2 in the salt
-        salt_values = salt.split("$")
+        salt_values = salt.split('$')
         just_salt = Base64URL.decode(salt_values[4])
-        cost_params = salt_values[3].split(",")
+        cost_params = salt_values[3].split(',')
 
         for param in cost_params
           begin
-            param_parts = param.split("=")
-            if (param_parts[0] == "t")
+            param_parts = param.split('=')
+            if (param_parts[0] == 't')
               time_cost = Integer(param_parts[1])
-            elsif (param_parts[0] == "m")
-              mem_cost = Math.log2(Integer(param_parts[1])).round
-            elsif (param_parts[0] == "p")
+            elsif (param_parts[0] == 'm')
+              mem_cost = (Math.log10(Integer(param_parts[1])) / 0.30103).round
+            elsif (param_parts[0] == 'p')
               threads = Integer(param_parts[1])
-            elsif (param_parts[0] == "l")
+            elsif (param_parts[0] == 'l')
               hash_length = Integer(param_parts[1])
             end
           rescue ArgumentError
@@ -227,7 +229,7 @@ module PasswordPing
           end
         end
 
-        if (salt_values[1] == "argon2i")
+        if (salt_values[1] == 'argon2i')
           return Argon2Wrapper.hash_argon2i_encode(to_hash, just_salt, time_cost, mem_cost, threads, hash_length)
         else
           return Argon2Wrapper.hash_argon2d_encode(to_hash, just_salt, time_cost, mem_cost, threads, hash_length)

@@ -10,8 +10,5 @@
 /pkg/
 /spec/reports/
 /tmp/
-/ext/argon2-wrapper/libargon2-wrapper.so
-/ext/argon2-wrapper/tests
-/ext/argon2-wrapper/libargon2-wrapper.bundle*
-passwordping-1.0.0.gem
+passwordping-1.0.*.gem
 *.bundle
