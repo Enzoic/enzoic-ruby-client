@@ -1,4 +1,4 @@
-# PasswordPing Ruby Client Library
+# Enzoic Ruby Client Library
 
 
 ## TOC
@@ -8,7 +8,7 @@ This README covers the following topics:
 - [Installation](#installation)
 - [Source](#source)
 - [API Overview](#api-overview)
-- [The PasswordPing constructor](#the-passwordping-constructor)
+- [The Enzoic constructor](#the-enzoic-constructor)
 - [Platform Requirements](#platform-requirements)
 - [RubyDocs](#rubydocs)
 
@@ -17,7 +17,7 @@ This README covers the following topics:
 The compiled library is available as a Ruby Gem:
 
 ```shell
-gem install passwordping
+gem install enzoic
 ```
 
 ### Source
@@ -29,48 +29,48 @@ You can build the project from the source in this repository.
 Here's the API in a nutshell.
 
 ```ruby
-require 'passwordping'
+require 'enzoic'
 
-# Create a new PasswordPing instance - this is our primary interface for making API calls
-passwordping = PasswordPing::PasswordPing.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET)
+# Create a new Enzoic instance - this is our primary interface for making API calls
+enzoic = Enzoic::Enzoic.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET)
 
 # Check whether a password has been compromised
-if passwordping.check_password("password-to-test")
+if enzoic.check_password("password-to-test")
     puts("Password is compromised")
 else
     puts("Password is not compromised")
 end
 
 # Check whether a specific set of credentials are compromised
-if passwordping.check_credentials("test@passwordping.com", "password-to-test")
+if enzoic.check_credentials("test@enzoic.com", "password-to-test")
     puts("Credentials are compromised")
 else
     puts("Credentials are not compromised")
 end
 
 # get all exposures for a given user
-exposures = passwordping.get_exposures_for_user("test@passwordping.com")
-puts(exposures.count.to_s + " exposures found for test@passwordping.com")
+exposures = enzoic.get_exposures_for_user("test@enzoic.com")
+puts(exposures.count.to_s + " exposures found for test@enzoic.com")
 
 # now get the full details for the first exposure found
-details = passwordping.get_exposure_details(exposures.exposures[0])
-puts("First exposure for test@passwordping.com was " + details.title)
+details = enzoic.get_exposure_details(exposures.exposures[0])
+puts("First exposure for test@enzoic.com was " + details.title)
 ```
 
 More information in reference format can be found below.
 
-## The PasswordPing constructor
+## The Enzoic constructor
 
-The standard constructor takes the API key and secret you were issued on PasswordPing signup.
+The standard constructor takes the API key and secret you were issued on Enzoic signup.
 
 ```ruby
-passwordping = PasswordPing::PasswordPing.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET)
+enzoic = Enzoic::Enzoic.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET)
 ```
 
 If you were instructed to use an alternate API endpoint, you may call the overloaded constructor and pass the base URL you were provided.
 
 ```ruby
-passwordping = PasswordPing::PasswordPing.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET, baseURL: "https://api-alt.passwordping.com/v1")
+enzoic = Enzoic::Enzoic.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET, baseURL: "https://api-alt.enzoic.com/v1")
 ```
 
 ## Platform Requirements
@@ -83,7 +83,7 @@ Ruby 2.0.0 and up are supported.
 
 The RubyDocs contain more complete references for the API functions.  
 
-They can be found here: <http://www.rubydoc.info/gems/passwordping>
+They can be found here: <http://www.rubydoc.info/gems/enzoic>
 
 ## License
 

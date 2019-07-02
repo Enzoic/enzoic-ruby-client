@@ -9,10 +9,10 @@
 #
 
 DIST_SRC = ../phc-winner-argon2/src
-SRC = $(DIST_SRC)/argon2.c $(DIST_SRC)/core.c $(DIST_SRC)/blake2/blake2b.c $(DIST_SRC)/thread.c $(DIST_SRC)/encoding.c
+SRC = $(DIST_SRC)/argon2.c $(DIST_SRC)/core.c $(DIST_SRC)/blake2/blake2b.c $(DIST_SRC)/thread.c $(DIST_SRC)/encoding.c argon2-wrapper.c
 OBJ = $(SRC:.c=.o)
 
-CFLAGS = -pthread -O3 -Wall -g -I../phc-winner-argon2/include -I../phc-winner-argon2/src
+CFLAGS = -pthread -O3 -Wall -I../phc-winner-argon2/include -I../phc-winner-argon2/src
 
 OPTTEST := $(shell $(CC) -Iinclude -Isrc -march=native src/opt.c -c 2>/dev/null; echo $$?)
 # Detect compatible platform

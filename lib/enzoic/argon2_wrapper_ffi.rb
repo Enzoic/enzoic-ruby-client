@@ -1,7 +1,7 @@
 require 'ffi'
 require 'ffi-compiler/loader'
 
-module PasswordPing
+module Enzoic
 
   # Import of argon2 wrapper library
   module Ext

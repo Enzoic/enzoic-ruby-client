@@ -14,4 +14,6 @@
 /ext/argon2-wrapper/tests
 /ext/argon2-wrapper/libargon2-wrapper.bundle*
 passwordping-1.0.0.gem
+enzoic-1.0.0.gem
+enzoic-*.gem
 *.bundle

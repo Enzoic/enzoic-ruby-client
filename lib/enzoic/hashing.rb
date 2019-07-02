@@ -1,4 +1,4 @@
-require 'passwordping/argon2_wrapper_ffi'
+require 'enzoic/argon2_wrapper_ffi'
 require 'digest'
 require 'bcrypt'
 require 'unix_crypt'
@@ -6,7 +6,7 @@ require 'zlib'
 require 'digest/whirlpool'
 require 'base64url'
 
-module PasswordPing
+module Enzoic
   class Hashing
     def self.md5(to_hash)
       return Digest::MD5.hexdigest to_hash

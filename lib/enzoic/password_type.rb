@@ -1,5 +1,5 @@
-module PasswordPing
-  # Constants utilized by the PasswordPing module
+module Enzoic
+  # Constants utilized by the Enzoic module
   module PasswordType
     Plaintext = 0
     MD5 = 1

@@ -1,5 +1,5 @@
-module PasswordPing
-  # Constants utilized by the PasswordPing module
+module Enzoic
+  # Constants utilized by the Enzoic module
   module Constants
     CREDENTIALS_API_PATH = "/credentials"
     PASSWORDS_API_PATH = "/passwords"

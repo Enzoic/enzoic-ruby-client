@@ -20,9 +20,9 @@ Rake::ExtensionTask.new('whirlpool', gemspec) do |ext|
   ext.lib_dir = 'lib/digest'
 end
 
-# Rake::ExtensionTask.new('argon2-wrapper', gemspec) do |ext|
-#   ext.ext_dir = 'ext/argon2-wrapper'
-#   ext.lib_dir = 'lib/passwordping'
-# end
+Rake::ExtensionTask.new('argon2-wrapper', gemspec) do |ext|
+  ext.ext_dir = 'ext/argon2-wrapper'
+  ext.lib_dir = 'lib/enzoic'
+end
 
 task :default => :test

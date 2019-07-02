@@ -1,30 +1,30 @@
-require 'passwordping/errors'
-require 'passwordping/constants'
-require 'passwordping/password_type'
-require 'passwordping/hashing'
+require 'enzoic/errors'
+require 'enzoic/constants'
+require 'enzoic/password_type'
+require 'enzoic/hashing'
 require 'cgi'
 require 'base64'
 require 'rest-client'
 require 'json'
 require 'ostruct'
 
-module PasswordPing
-  # This is the main entry point for accessing PasswordPing.
+module Enzoic
+  # This is the main entry point for accessing Enzoic.
   #
   # Create this class with your API Key and Secret and then call the desired methods on the class
-  # to access the PasswordPing API.
-  class PasswordPing
+  # to access the Enzoic API.
+  class Enzoic
     def initialize(options = {})
       @apiKey = options[:apiKey] || '';
-      raise PasswordPingFail, "No API key provided" if @apiKey == ''
+      raise EnzoicFail, "No API key provided" if @apiKey == ''
       @secret = options[:secret] || '';
-      raise PasswordPingFail, "No Secret provided" if @secret == ''
-      @baseURL = options[:baseURL] || "https://api.passwordping.com/v1"
+      raise EnzoicFail, "No Secret provided" if @secret == ''
+      @baseURL = options[:baseURL] || "https://api.enzoic.com/v1"
       @authString = calc_auth_string(@apiKey, @secret)
     end
 
     def check_credentials(username, password)
-      raise PasswordPingFail, "API key/Secret not set" if !@authString || @authString == ''
+      raise EnzoicFail, "API key/Secret not set" if !@authString || @authString == ''
 
       response = make_rest_call(@baseURL + Constants::ACCOUNTS_API_PATH + "?username=" + Hashing.sha256(username), "GET", nil)
 
