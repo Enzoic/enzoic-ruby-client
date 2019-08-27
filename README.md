@@ -48,6 +48,18 @@ else
     puts("Credentials are not compromised")
 end
 
+# Check whether a specific set of credentials are compromised, using the optional 
+# lastCheckData parameter.
+# lastCheckDate is the timestamp for the last check you performed for this user.
+# If the DateTime you provide for the last check is greater than the timestamp Enzoic has 
+# for the last breach affecting this user, the check will not be performed.  
+# This can be used to substantially increase performance. 
+if enzoic.check_credentials("test@enzoic.com", "password-to-test", DateTime.parse("2019-07-15T19:57:43.000Z"))
+    puts("Credentials are compromised")
+else
+    puts("Credentials are not compromised")
+end
+
 # get all exposures for a given user
 exposures = enzoic.get_exposures_for_user("test@enzoic.com")
 puts(exposures.count.to_s + " exposures found for test@enzoic.com")

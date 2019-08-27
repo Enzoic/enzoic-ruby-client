@@ -23,7 +23,7 @@ module Enzoic
       @authString = calc_auth_string(@apiKey, @secret)
     end
 
-    def check_credentials(username, password)
+    def check_credentials(username, password, lastCheckTimestamp = Date.new(1980, 1, 1))
       raise EnzoicFail, "API key/Secret not set" if !@authString || @authString == ''
 
       response = make_rest_call(@baseURL + Constants::ACCOUNTS_API_PATH + "?username=" + Hashing.sha256(username), "GET", nil)
@@ -33,40 +33,44 @@ module Enzoic
       end
 
       account_response = JSON.parse(response)
-      hashes_required = account_response["passwordHashesRequired"]
 
-      bcrypt_count = 0
-      query_string = ""
+      # if lastCheckTimestamp was provided, see if we need to go any further
+      if (Date.parse(account_response["lastBreachDate"]) > lastCheckTimestamp)
+        hashes_required = account_response["passwordHashesRequired"]
 
-      for i in 0..hashes_required.length - 1 do
-        hash_spec = hashes_required[i]
+        bcrypt_count = 0
+        query_string = ""
 
-        # bcrypt gets far too expensive for good response time if there are many of them to calculate.
-        # some mostly garbage accounts have accumulated a number of them in our DB and if we happen to hit one it
-        # kills performance, so short circuit out after at most 2 BCrypt hashes
-        if (hash_spec["hashType"] != PasswordType::BCrypt || bcrypt_count <= 2)
-          if (hash_spec["hashType"] == PasswordType::BCrypt)
-            bcrypt_count = bcrypt_count + 1
-          end
+        for i in 0..hashes_required.length - 1 do
+          hash_spec = hashes_required[i]
 
-          if (hash_spec["hashType"] != nil)
-            credential_hash = calc_credential_hash(username, password, account_response["salt"], hash_spec);
+          # bcrypt gets far too expensive for good response time if there are many of them to calculate.
+          # some mostly garbage accounts have accumulated a number of them in our DB and if we happen to hit one it
+          # kills performance, so short circuit out after at most 2 BCrypt hashes
+          if (hash_spec["hashType"] != PasswordType::BCrypt || bcrypt_count <= 2)
+            if (hash_spec["hashType"] == PasswordType::BCrypt)
+              bcrypt_count = bcrypt_count + 1
+            end
 
-            if (credential_hash != nil)
-              if (query_string.length == 0)
-                query_string = query_string + "?hashes=" + CGI.escape(credential_hash);
-              else
-                query_string = query_string + "&hashes=" + CGI.escape(credential_hash);
+            if (hash_spec["hashType"] != nil)
+              credential_hash = calc_credential_hash(username, password, account_response["salt"], hash_spec);
+
+              if (credential_hash != nil)
+                if (query_string.length == 0)
+                  query_string = query_string + "?hashes=" + CGI.escape(credential_hash);
+                else
+                  query_string = query_string + "&hashes=" + CGI.escape(credential_hash);
+                end
               end
             end
           end
         end
-      end
 
-      if (query_string.length > 0)
-        creds_response = make_rest_call(
-                @baseURL + Constants::CREDENTIALS_API_PATH + query_string, "GET", nil)
-        return creds_response != "404"
+        if (query_string.length > 0)
+          creds_response = make_rest_call(
+                  @baseURL + Constants::CREDENTIALS_API_PATH + query_string, "GET", nil)
+          return creds_response != "404"
+        end
       end
 
       return false

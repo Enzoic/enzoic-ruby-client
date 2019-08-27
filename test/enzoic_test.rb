@@ -31,8 +31,9 @@ class EnzoicTest < Test::Unit::TestCase
 
   def test_check_credentials
     enzoic = get_enzoic()
-    assert(enzoic.check_credentials('test@passwordping.com', '123456'))
-    assert(!enzoic.check_credentials('test@passwordping.com', '123456122'))
+    assert(enzoic.check_credentials('eicar_2@enzoic.com', '123456'))
+    assert(!enzoic.check_credentials('eicar_2@enzoic.com', '123456122'))
+    assert(!enzoic.check_credentials('eicar_2@enzoic.com', '123456', DateTime.now))
   end
 
   def test_check_password
