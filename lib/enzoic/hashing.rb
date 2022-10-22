@@ -24,6 +24,14 @@ module Enzoic
       return Digest::SHA1.hexdigest to_hash
     end
 
+    def self.sha1_binary(to_hash)
+      return Digest::SHA1.digest(to_hash).bytes
+    end
+
+    def self.sha1_binary_array(to_hash_bytes)
+      return Digest::SHA1.digest(to_hash_bytes.pack('c*')).bytes
+    end
+
     def self.sha256(to_hash)
       return Digest::SHA256.hexdigest to_hash
     end
@@ -91,7 +99,7 @@ module Enzoic
 
       itoa64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
       to_hash_bytes = to_hash.bytes
-      count = 2**itoa64.index(salt[3])
+      count = 2 ** itoa64.index(salt[3])
       justsalt = salt[4..12]
 
       hash = self.md5_binary(justsalt + to_hash)
@@ -148,11 +156,144 @@ module Enzoic
     end
 
     def self.md5crypt(to_hash, salt)
-      return UnixCrypt::MD5.build(to_hash, salt.start_with?("$1$") ? salt[3..salt.length] : salt);
+      return UnixCrypt::MD5.build(to_hash, salt.start_with?("$1$") ? salt[3..salt.length] : salt)
     end
 
     def self.custom_algorithm4(to_hash, salt)
       return self.bcrypt(self.md5(to_hash), salt)
+    end
+
+    def self.custom_algorithm5(to_hash, salt)
+      return self.sha256(self.md5(to_hash + salt))
+    end
+
+    def self.osCommerce_AEF(to_hash, salt)
+      return self.md5(salt + to_hash)
+    end
+
+    def self.desCrypt(to_hash, salt)
+      return UnixCrypt::DES.build(to_hash, salt)
+    end
+
+    def self.convertToUnsigned(val)
+      return [val].pack('L').unpack('L').first
+    end
+
+    def self.mySQLPre4_1(to_hash)
+      nr = 1345345333
+      add = 7
+      nr2 = 0x12345671
+
+      for i in 0..to_hash.length - 1 do
+        c = to_hash[i]
+
+        if c == " " || c == "\t"
+          next
+        end
+
+        tmp = c.ord
+        nr = nr ^ ((((nr & 63) + add) * tmp) + (self.convertToUnsigned(nr << 8)))
+        nr2 += (self.convertToUnsigned(nr2 << 8)) ^ nr
+        add += tmp
+      end
+
+      result1 = nr & ((self.convertToUnsigned(1 << 31)) - 1)
+      result2 = nr2 & ((self.convertToUnsigned(1 << 31)) - 1)
+
+      return result1.to_s(16) + result2.to_s(16)
+    end
+
+    def self.mySQLPost4_1(to_hash)
+      return "*" + self.bytes_to_hex(self.sha1_binary_array(self.sha1_binary(to_hash)));
+    end
+
+    def self.punBB(to_hash, salt)
+      return self.sha1(salt + self.sha1(to_hash))
+    end
+
+    def self.custom_algorithm6(to_hash, salt)
+      return self.sha1(to_hash + salt)
+    end
+
+    def self.partial_md5_20(to_hash)
+      return self.md5(to_hash)[0..19]
+    end
+
+    def self.partial_md5_29(to_hash)
+      return self.md5(to_hash)[0..28]
+    end
+
+    def self.ave_datalife_diferior(to_hash)
+      return self.md5(self.md5(to_hash))
+    end
+
+    def self.django_md5(to_hash, salt)
+      return "md5$" + salt + "$" + self.md5(salt + to_hash)
+    end
+
+    def self.django_sha1(to_hash, salt)
+      return "sha1$" + salt + "$" + self.sha1(salt + to_hash)
+    end
+
+    def self.pligg_cms(to_hash, salt)
+      return salt + self.sha1(salt + to_hash)
+    end
+
+    def self.runcms_smf1_1(to_hash, salt)
+      return self.sha1(salt + to_hash)
+    end
+
+    def self.ntlm(to_hash)
+      pwd = to_hash.dup
+      pwd = pwd.dup.force_encoding('UTF-8').encode(Encoding::UTF_16LE, Encoding::UTF_8).force_encoding('UTF-8')
+      OpenSSL::Digest::MD4.hexdigest pwd
+    end
+
+    def self.sha1dash(to_hash, salt)
+      return self.sha1("--" + salt + "--" + to_hash + "--")
+    end
+
+    def self.sha384(to_hash)
+      return Digest::SHA384.hexdigest to_hash
+    end
+
+    def self.custom_algorithm7(to_hash, salt)
+      derived_salt = self.sha1(salt)
+      return OpenSSL::HMAC.hexdigest("SHA256",
+                                     "d2e1a4c569e7018cc142e9cce755a964bd9b193d2d31f02d80bb589c959afd7e",
+                                     derived_salt + to_hash)
+    end
+
+    def self.custom_algorithm9(to_hash, salt)
+      result = self.sha512(to_hash + salt)
+      for i in 0..10 do
+        result = self.sha512(result)
+      end
+      return result
+    end
+
+    def self.sha512crypt(to_hash, salt)
+      return UnixCrypt::SHA512.build(to_hash, salt.start_with?("$6$") ? salt[3..salt.length] : salt)
+    end
+
+    def self.custom_algorithm10(to_hash, salt)
+      return self.sha512(to_hash + ":" + salt)
+    end
+
+    def self.sha256crypt(to_hash, salt)
+      salt_to_use = salt
+      if salt_to_use.start_with?("$5$")
+        salt_to_use = salt_to_use[3..salt.length];
+      end
+      if salt_to_use.start_with?("rounds=")
+        salt_to_use = salt_to_use[salt_to_use.index("$") + 1..salt_to_use.length]
+      end
+
+      return UnixCrypt::SHA256.build(to_hash, salt_to_use)
+    end
+
+    def self.authMeSHA256(to_hash, salt)
+      return "$SHA$" + salt + "$" + self.sha256(self.sha256(to_hash) + salt);
     end
 
     def self.argon2_raw(to_hash, salt)
@@ -238,13 +379,13 @@ module Enzoic
     end
 
     def self.xor(byte_array1, byte_array2)
-        result = Array.new(byte_array1.length);
+      result = Array.new(byte_array1.length);
 
-        for i in 0..byte_array1.length - 1 do
-            result[i] = byte_array1[i] ^ byte_array2[i];
-        end
+      for i in 0..byte_array1.length - 1 do
+        result[i] = byte_array1[i] ^ byte_array2[i];
+      end
 
-        return result;
+      return result;
     end
 
     def self.bytes_to_hex(bytes)

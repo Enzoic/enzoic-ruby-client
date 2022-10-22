@@ -35,6 +35,7 @@ require 'enzoic'
 enzoic = Enzoic::Enzoic.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET)
 
 # Check whether a password has been compromised
+# see https://www.enzoic.com/docs-passwords-api/ for more information
 if enzoic.check_password("password-to-test")
     puts("Password is compromised")
 else
@@ -42,6 +43,7 @@ else
 end
 
 # Check whether a specific set of credentials are compromised
+# see https://www.enzoic.com/docs-credentials-api/ for more information
 if enzoic.check_credentials("test@enzoic.com", "password-to-test")
     puts("Credentials are compromised")
 else
@@ -53,7 +55,7 @@ end
 # lastCheckDate is the timestamp for the last check you performed for this user.
 # If the DateTime you provide for the last check is greater than the timestamp Enzoic has 
 # for the last breach affecting this user, the check will not be performed.  
-# This can be used to substantially increase performance. 
+# This can be used to substantially increase performance.
 if enzoic.check_credentials("test@enzoic.com", "password-to-test", DateTime.parse("2019-07-15T19:57:43.000Z"))
     puts("Credentials are compromised")
 else
@@ -61,12 +63,20 @@ else
 end
 
 # get all exposures for a given user
+# see https://www.enzoic.com/docs-exposures-api/#get-exposures for more information
 exposures = enzoic.get_exposures_for_user("test@enzoic.com")
 puts(exposures.count.to_s + " exposures found for test@enzoic.com")
 
 # now get the full details for the first exposure found
+# see https://www.enzoic.com/docs-exposures-api/#get-exposure-details for more information
 details = enzoic.get_exposure_details(exposures.exposures[0])
 puts("First exposure for test@enzoic.com was " + details.title)
+
+# get all passwords for a given user - requires special approval, contact Enzoic sales
+# see https://www.enzoic.com/docs-raw-passwords-api/ for more information
+user_passwords = enzoic.get_passwords_for_user("eicar_0@enzoic.com")
+puts("First password for eicar_0@enzoic.com was " + user_passwords.passwords[0].password)
+
 ```
 
 More information in reference format can be found below.
