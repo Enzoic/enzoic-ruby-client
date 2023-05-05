@@ -164,8 +164,9 @@ class EnzoicTest < Test::Unit::TestCase
     assert_equal("07c691fa8b022b52ac1c44cab3e056b344a7945b6eb9db727e3842b28d94fe18c17fe5b47b1b9a29d8149acbd7b3f73866cc12f0a8a8b7ab4ac9470885e052dc", enzoic.send(:calc_password_hash, Enzoic::PasswordType::CustomAlgorithm9, "0rangepeel", "6kpcxVSjagLgsNCUCr-D"))
     assert_equal("$6$52450745$k5ka2p8bFuSmoVT1tzOyyuaREkkKBcCNqoDKzYiJL9RaE8yMnPgh2XzzF0NDrUhgrcLwg78xs1w5pJiypEdFX/", enzoic.send(:calc_password_hash, Enzoic::PasswordType::SHA512Crypt, "hashcat", "$6$52450745"))
     assert_equal("bd17b9d14010a1d4f8c8077f1be1e20b9364d9979bbcf8591337e952cc6037026aa4a2025543d39169022344b4dd1d20f499395533e35705296034bbf7e7d663", enzoic.send(:calc_password_hash, Enzoic::PasswordType::CustomAlgorithm10, "chatbooks", "NqXCvAHUpAWAco3hVTG5Sg0FfmJRQPKi0LvcHwylzXHhSNuWwvYdMSSGzswi0ZdJ"))
-    assert_equal("$5$GX7BopJZJxPc/KEK$le16UF8I2Anb.rOrn22AUPWvzUETDGefUmAV8AZkGcD", enzoic.send(:calc_password_hash, Enzoic::PasswordType::SHA256Crypt, "hashcat", "$5$rounds=5000$GX7BopJZJxPc/KEK"))
+    assert_equal("$5$rounds=5000$GX7BopJZJxPc/KEK$le16UF8I2Anb.rOrn22AUPWvzUETDGefUmAV8AZkGcD", enzoic.send(:calc_password_hash, Enzoic::PasswordType::SHA256Crypt, "hashcat", "$5$rounds=5000$GX7BopJZJxPc/KEK"))
     assert_equal("$SHA$7218532375810603$bfede293ecf6539211a7305ea218b9f3f608953130405cda9eaba6fb6250f824", enzoic.send(:calc_password_hash, Enzoic::PasswordType::AuthMeSHA256, "hashcat", "7218532375810603"))
+    assert_equal("c95adcd2c095d3733e3d01c8d06cd32129df5f16", enzoic.send(:calc_password_hash, Enzoic::PasswordType::HMACSHA1_SaltAsHash, "123456", "74cc8774"))
   end
 
   private

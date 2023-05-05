@@ -3,7 +3,8 @@ require 'digest'
 require 'bcrypt'
 require 'unix_crypt'
 require 'zlib'
-require 'digest/whirlpool'
+require 'digest/whirlpool.bundle'
+#require 'open_ssl'
 require 'base64url'
 
 module Enzoic
@@ -272,24 +273,47 @@ module Enzoic
       return result
     end
 
+    def self.sha256crypt(to_hash, salt)
+      return self.sha_crypt("5", UnixCrypt::SHA256, to_hash, salt)
+    end
+
     def self.sha512crypt(to_hash, salt)
-      return UnixCrypt::SHA512.build(to_hash, salt.start_with?("$6$") ? salt[3..salt.length] : salt)
+      return self.sha_crypt("6", UnixCrypt::SHA512, to_hash, salt)
+    end
+
+    def self.sha_crypt(crypt_version, crypter, to_hash, salt)
+      # special handling if the salt contains an embedded rounds specifier
+      if salt.start_with?("$" + crypt_version + "$") && salt.include?("$rounds=")
+        # extract rounds
+        rounds_starting_idx = salt.index("$rounds=") + 8
+        rounds = salt[rounds_starting_idx..salt.length]
+        salt_portion = rounds[rounds.index("$") + 1..rounds.length]
+
+        begin
+          rounds = Integer(rounds[0..rounds.index("$") - 1])
+        rescue ArgumentError
+          rounds = 5000
+        end
+
+        result = crypter.build(to_hash, salt_portion, rounds)
+
+        # if the default rounds of 5000 was used, add this back in to the resultant hash as this library, unlike most,
+        # will strip it out.
+        if rounds == 5000
+          result = result[0..2] + "rounds=5000$" + result[3..result.length]
+        end
+
+        return result
+      end
+      return crypter.build(to_hash, salt.start_with?("$" + crypt_version + "$") ? salt[3..salt.length] : salt)
     end
 
     def self.custom_algorithm10(to_hash, salt)
       return self.sha512(to_hash + ":" + salt)
     end
 
-    def self.sha256crypt(to_hash, salt)
-      salt_to_use = salt
-      if salt_to_use.start_with?("$5$")
-        salt_to_use = salt_to_use[3..salt.length];
-      end
-      if salt_to_use.start_with?("rounds=")
-        salt_to_use = salt_to_use[salt_to_use.index("$") + 1..salt_to_use.length]
-      end
-
-      return UnixCrypt::SHA256.build(to_hash, salt_to_use)
+    def self.hmac_sha1_salt_as_hash(to_hash, salt)
+      return OpenSSL::HMAC.hexdigest("sha1", salt, to_hash)
     end
 
     def self.authMeSHA256(to_hash, salt)

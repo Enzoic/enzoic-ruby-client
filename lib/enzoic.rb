@@ -301,6 +301,10 @@ module Enzoic
         if salt != nil && salt.length > 0
           return Hashing.authMeSHA256(password, salt)
         end
+      when PasswordType::HMACSHA1_SaltAsHash
+        if salt != nil && salt.length > 0
+          return Hashing.hmac_sha1_salt_as_hash(password, salt)
+        end
       else
         return nil
       end

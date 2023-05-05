@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.add_dependency 'ffi', '~> 1.11.1'
+  spec.add_dependency 'ffi', '~> 1.15.5'
   spec.add_dependency 'ffi-compiler', '~> 1.0.1'
   spec.add_dependency 'rest-client', '~> 2.0', '>= 2.0.2'
   spec.add_dependency 'bcrypt', '~> 3.1', '>= 3.1.11'

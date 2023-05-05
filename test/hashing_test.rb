@@ -71,10 +71,6 @@ class HashingTest < Test::Unit::TestCase
     assert_equal("X.OPW8uuoq5N.", Enzoic::Hashing.desCrypt("password", "X."))
   end
 
-  def test_sha256crypt
-    assert_equal("$5$GX7BopJZJxPc/KEK$le16UF8I2Anb.rOrn22AUPWvzUETDGefUmAV8AZkGcD", Enzoic::Hashing.sha256crypt("hashcat", "$5$rounds=5000$GX7BopJZJxPc/KEK"))
-  end
-
   def test_mySQLPre4_1
     assert_equal("5d2e19393cc5ef67", Enzoic::Hashing.mySQLPre4_1("password"))
   end
@@ -141,14 +137,36 @@ class HashingTest < Test::Unit::TestCase
                  Enzoic::Hashing.custom_algorithm9("0rangepeel", "6kpcxVSjagLgsNCUCr-D"))
   end
 
+  def test_sha256crypt
+    assert_equal("$5$GX7BopJZJxPc/KEK$le16UF8I2Anb.rOrn22AUPWvzUETDGefUmAV8AZkGcD",
+                 Enzoic::Hashing.sha256crypt("hashcat", "$5$GX7BopJZJxPc/KEK"))
+    # try with rounds specifier
+    assert_equal("$5$rounds=5000$GX7BopJZJxPc/KEK$le16UF8I2Anb.rOrn22AUPWvzUETDGefUmAV8AZkGcD",
+                 Enzoic::Hashing.sha256crypt("hashcat", "$5$rounds=5000$GX7BopJZJxPc/KEK"))
+    assert_equal("$5$rounds=4000$GX7BopJZJxPc/KEK$sn.Ds3.Gebi0n6vih/PyOUqlagz5FGk1ITvNh7f1ZMC",
+                 Enzoic::Hashing.sha256crypt("hashcat", "$5$rounds=4000$GX7BopJZJxPc/KEK"))
+    assert_equal("$5$rounds=5000$GX7BopJZJxPc/KEK$le16UF8I2Anb.rOrn22AUPWvzUETDGefUmAV8AZkGcD",
+                 Enzoic::Hashing.sha256crypt("hashcat", "$5$rounds=sds$GX7BopJZJxPc/KEK"))
+  end
+
   def test_sha512crypt
     assert_equal("$6$52450745$k5ka2p8bFuSmoVT1tzOyyuaREkkKBcCNqoDKzYiJL9RaE8yMnPgh2XzzF0NDrUhgrcLwg78xs1w5pJiypEdFX/",
                  Enzoic::Hashing.sha512crypt("hashcat", "$6$52450745"))
+    # try with rounds specifier
+    assert_equal("$6$rounds=5000$52450745$k5ka2p8bFuSmoVT1tzOyyuaREkkKBcCNqoDKzYiJL9RaE8yMnPgh2XzzF0NDrUhgrcLwg78xs1w5pJiypEdFX/",
+                 Enzoic::Hashing.sha512crypt("hashcat", "$6$rounds=5000$52450745"))
+    assert_equal("$6$rounds=4000$52450745$SpwN1flz4M8T.VckR9l.UofKPTtPvUx3ZfNSAQ.ruUsFBCvC1mz49quqhSrPjK4p25hfLcDZF/86iiA0n38Dh/",
+                 Enzoic::Hashing.sha512crypt("hashcat", "$6$rounds=4000$52450745"))
   end
 
   def test_custom_algorithm10
     assert_equal("bd17b9d14010a1d4f8c8077f1be1e20b9364d9979bbcf8591337e952cc6037026aa4a2025543d39169022344b4dd1d20f499395533e35705296034bbf7e7d663",
                  Enzoic::Hashing.custom_algorithm10("chatbooks", "NqXCvAHUpAWAco3hVTG5Sg0FfmJRQPKi0LvcHwylzXHhSNuWwvYdMSSGzswi0ZdJ"))
+  end
+
+  def test_hmac_sha1_salt_as_hash
+    assert_equal("d89c92b4400b15c39e462a8caa939ab40c3aeeea",
+                 Enzoic::Hashing.hmac_sha1_salt_as_hash("hashcat", "1234"))
   end
 
   def test_authMeSHA256
