@@ -138,9 +138,10 @@ module Enzoic
       end
     end
 
-    def get_passwords_for_user(username)
+    def get_passwords_for_user(username, include_exposure_details = false)
       response = make_rest_call(@baseURL + Constants::ACCOUNTS_API_PATH + "?username=" +
-                                  Hashing.sha256(username.downcase) + "&includePasswords=1",
+                                  Hashing.sha256(username.downcase) + "&includePasswords=1" +
+                                  (include_exposure_details ? "&includeExposureDetails=1" : ""),
                                 "GET", nil)
 
       if response == "404"

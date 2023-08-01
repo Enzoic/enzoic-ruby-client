@@ -127,6 +127,32 @@ class EnzoicTest < Test::Unit::TestCase
     end
   end
 
+  def test_get_passwords_for_user_with_exposure_details
+    enzoic = get_enzoic
+
+    result = enzoic.get_passwords_for_user("eicar_type8@enzoic.com", true)
+    assert_equal(2, result.passwords.length)
+    assert_equal("2022-05-03T05:12:43.000Z", result.lastBreachDate)
+    assert_equal(JSON.parse('[
+                   {
+                     "hashType": 8,
+                     "salt": "$2a$10$LuodKoFv1YoTRpRBHjfeJ.",
+                     "password": "$2a$10$LuodKoFv1YoTRpRBHjfeJ.HsMNx6Ln/Qo/jlSHDa6XpWm/SYoSroG",
+                     "exposures": [
+                        {"id": "6270b9cb0323b3bb8faed96c", "title": "enzoic.com test breach BCrypt", "entries": 1, "date": "2010-01-01T07:00:00.000Z", "category": "Testing Ignore", "source": "Testing - Ignore", "passwordType": "BCrypt", "exposedData": ["Emails", "Passwords"], "dateAdded": "2022-05-03T05:12:43.000Z", "sourceURLs": [], "sourceFileCount": 1, "domainsAffected": 1}
+                     ]
+                   },
+                   {
+                     "hashType": 8,
+                     "salt": "$2y$04$dgoRREIMJItkLVH7xpSpo.",
+                     "password": "$2y$04$dgoRREIMJItkLVH7xpSpo.tqkpEM5J/JU9HB4LNO9eD/aygJN3dZ2",
+                     "exposures": [
+                        {"id": "6270b9cb0323b3bb8faed96c", "title": "enzoic.com test breach BCrypt", "entries": 1, "date": "2010-01-01T07:00:00.000Z", "category": "Testing Ignore", "source": "Testing - Ignore", "passwordType": "BCrypt", "exposedData": ["Emails", "Passwords"], "dateAdded": "2022-05-03T05:12:43.000Z", "sourceURLs": [], "sourceFileCount": 1, "domainsAffected": 1}
+                     ]
+                   }
+                 ]', object_class: OpenStruct), result.passwords)
+  end
+
   def test_calc_password_hash
     enzoic = get_enzoic
 

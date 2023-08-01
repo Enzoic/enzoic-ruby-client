@@ -35,7 +35,8 @@ require 'enzoic'
 enzoic = Enzoic::Enzoic.new(apiKey: YOUR_API_KEY, secret: YOUR_API_SECRET)
 
 # Check whether a password has been compromised
-# see https://www.enzoic.com/docs-passwords-api/ for more information
+# for more information, see 
+# https://docs.enzoic.com/enzoic-api-developer-documentation/api-reference/passwords-api
 if enzoic.check_password("password-to-test")
     puts("Password is compromised")
 else
@@ -43,7 +44,8 @@ else
 end
 
 # Check whether a specific set of credentials are compromised
-# see https://www.enzoic.com/docs-credentials-api/ for more information
+# for more information, see 
+# https://docs.enzoic.com/enzoic-api-developer-documentation/api-reference/credentials-api/hashed-credentials-api 
 if enzoic.check_credentials("test@enzoic.com", "password-to-test")
     puts("Credentials are compromised")
 else
@@ -63,18 +65,21 @@ else
 end
 
 # get all exposures for a given user
-# see https://www.enzoic.com/docs-exposures-api/#get-exposures for more information
+# for more information, see 
+# https://docs.enzoic.com/enzoic-api-developer-documentation/api-reference/exposures-api/get-exposures-for-an-email-address
 exposures = enzoic.get_exposures_for_user("test@enzoic.com")
 puts(exposures.count.to_s + " exposures found for test@enzoic.com")
 
 # now get the full details for the first exposure found
-# see https://www.enzoic.com/docs-exposures-api/#get-exposure-details for more information
+# for more information, see 
+# https://docs.enzoic.com/enzoic-api-developer-documentation/api-reference/exposures-api/retrieve-details-for-an-exposure
 details = enzoic.get_exposure_details(exposures.exposures[0])
 puts("First exposure for test@enzoic.com was " + details.title)
 
 # get all passwords for a given user - requires special approval, contact Enzoic sales
-# see https://www.enzoic.com/docs-raw-passwords-api/ for more information
-user_passwords = enzoic.get_passwords_for_user("eicar_0@enzoic.com")
+# for more information, see 
+# https://docs.enzoic.com/enzoic-api-developer-documentation/api-reference/credentials-api/cleartext-credentials-api
+user_passwords = enzoic.get_passwords_for_user("eicar_0@enzoic.com", true)
 puts("First password for eicar_0@enzoic.com was " + user_passwords.passwords[0].password)
 
 ```
